@@ -1,0 +1,13 @@
+Flags
+	-seed the url to start the crawl with
+	-base the base of the url (ex: https://rei.com) that the crawler will stay on
+	-match 
+	-maxUrls
+	-maxResults
+	-maxRedirect
+	-threads
+	-crawlOutput
+	-scraperConfig
+	-scraperInput
+	-scraperOutput
+	-threadedScraper

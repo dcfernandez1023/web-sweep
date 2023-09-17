@@ -1,9 +1,10 @@
-package edu.usfca.cs272.web;
+package com.crawler;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class HtmlFetcher {
 	public static final String LOCATION = "Location";
 	/** Constant for content header */
 	public static final String CONTENT = "Content";
+	public static final String STATUS_CODE = ":Status";
 	/** Constant for 200 OK status code */
 	public static final int OK = 200;
 	/**
@@ -52,12 +54,8 @@ public class HtmlFetcher {
 	 * @return the HTTP status code or -1 if unable to parse for any reasons
 	 */
 	public static int getStatusCode(Map<String, List<String>> headers) {
-		List<String> firstHeader = headers.get(null);
 		try {
-			String line = firstHeader.get(0);
-			int statusCodeStart = line.indexOf(' ') + 1;
-			int statusCodeEnd = line.indexOf(' ', statusCodeStart);
-			return Integer.parseInt(line.substring(statusCodeStart, statusCodeEnd));
+			return Integer.parseInt(headers.get(STATUS_CODE).get(0));
 		} catch (Exception e) {
 			return -1;
 		}
@@ -99,7 +97,8 @@ public class HtmlFetcher {
 	public static String fetch(URL url, int redirects) {
 		String html = null;
 		try {
-			Map<String, List<String>> headers = HttpsFetcher.fetchUrl(url);
+			HttpResponse<String> httpResponse = HttpsFetcher.fetchUrl(url);
+			Map<String, List<String>> headers = httpResponse.headers().map();
 			boolean isHtml = isHtml(headers);
 			boolean follow = isRedirect(headers);
 			if (!isHtml && !follow) {
@@ -109,13 +108,14 @@ public class HtmlFetcher {
 			while (follow && redirectCount < redirects) {
 				redirectCount++;
 				url = new URL(getHeader(headers, LOCATION).get(0));
-				headers = HttpsFetcher.fetchUrl(url);
+				httpResponse = HttpsFetcher.fetchUrl(url);
+				headers = httpResponse.headers().map();
 				follow = isRedirect(headers);
 			}
 			if (!isHtml(headers) || getStatusCode(headers) != OK) {
 				return null;
 			}
-			String content = String.join(System.getProperty("line.separator"), getHeader(headers, CONTENT)) + System.getProperty("line.separator");
+			String content = httpResponse.body();
 			return content;
 		} catch (Exception e) {
 			html = null;

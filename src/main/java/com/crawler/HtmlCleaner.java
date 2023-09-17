@@ -1,4 +1,4 @@
-package edu.usfca.cs272.web;
+package com.crawler;
 
 import java.util.regex.Pattern;
 
