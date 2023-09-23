@@ -160,3 +160,4 @@ actual/
 index.json
 results.json
 counts.json
+/.apt_generated_tests/

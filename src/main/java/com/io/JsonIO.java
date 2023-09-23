@@ -1,5 +1,6 @@
-package com.json;
+package com.io;
 
+import com.Sweep.Sweep;
 import com.crawler.WebCrawler.CrawlResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -40,6 +41,15 @@ public class JsonIO {
         	config.add(new ConfigField(selectorType, selectorValue, name, fallbackValue, dataType));
         }
         return config;
+	}
+	
+	public static Sweep readSweepConfig(String path) throws Exception {
+        Gson gson = new Gson();
+        Type type = new TypeToken<Sweep>(){}.getType();
+        FileReader fileReader = new FileReader(path);
+        Sweep sweep = gson.fromJson(fileReader, type);
+        fileReader.close();
+        return sweep;
 	}
 	
 	public static void crawlResultsToJson(List<CrawlResult> crawlResults, String path) throws IOException {

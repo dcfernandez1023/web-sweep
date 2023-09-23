@@ -4,12 +4,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-/**
- * Parses and stores command-line arguments into simple flag/value pairs.
- *
- * @author CS 272 Software Development (University of San Francisco)
- * @version Fall 2022
- */
 public class ArgumentParser {
 	/**
 	 * Stores command-line arguments in flag/value pairs.
@@ -139,6 +133,7 @@ public class ArgumentParser {
 		String val = this.map.get(flag);
 		return val != null ? val : backup;
 	}
+
 
 	/**
 	 * Returns the value to which the specified flag is mapped as a {@link String}

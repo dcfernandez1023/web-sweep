@@ -12,9 +12,6 @@ import java.net.http.HttpResponse;
 /**
  * An alternative to using {@link Socket} connections instead of a
  * {@link URLConnection} to fetch the headers and content from a URL on the web.
- *
- * @author CS 272 Software Development (University of San Francisco)
- * @version Fall 2022
  */
 public class HttpsFetcher {
 	/**

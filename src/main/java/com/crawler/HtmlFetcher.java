@@ -14,9 +14,6 @@ import java.util.Map;
  * returns HTML content if possible.
  *
  * @see HttpsFetcher
- *
- * @author CS 272 Software Development (University of San Francisco)
- * @version Fall 2022
  */ 
 public class HtmlFetcher {
 	/** Constant for content-type header */

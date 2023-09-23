@@ -18,9 +18,6 @@ import org.apache.commons.text.StringEscapeUtils;
  * @see Pattern#DOTALL
  * @see Pattern#CASE_INSENSITIVE
  * @see StringEscapeUtils#unescapeHtml4(String)
- *
- * @author CS 272 Software Development (University of San Francisco)
- * @version Fall 2022
  */
 public class HtmlCleaner {
 	/**

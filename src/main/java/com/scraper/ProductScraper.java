@@ -1,6 +1,7 @@
 package com.scraper;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jsoup.Jsoup;
@@ -13,7 +14,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
-import org.jsoup.select.Elements;
 
 import com.crawler.WebCrawler.CrawlResult;
 import com.threading.WorkQueue;
@@ -74,10 +74,10 @@ public class ProductScraper {
 	private void scrape(String url, List<ConfigField> config, List<ScrapeResult> scrapeResults, boolean isMultiThreaded) throws Exception {
 		String html = Jsoup.connect(url).get().html();
 		org.jsoup.nodes.Document doc = Jsoup.parse(html);
+		List<ScrapeResult> localScrapeResults = new ArrayList<>();
 		
-        ScrapeResult scrapeResult = new ScrapeResult(url);
         for (ConfigField field : config) {
-        	org.jsoup.nodes.Element element = null;
+        	List<org.jsoup.nodes.Element> elements = new ArrayList<>();
         	
         	String selectorType = field.getSelectorType();
         	String selectorValue = field.getSelectorValue();
@@ -86,32 +86,44 @@ public class ProductScraper {
         	String dataType = field.getDataType();
         	
         	if (selectorType.equals("ID")) {
-        		element = doc.getElementById(selectorValue);
+        		elements.add(doc.getElementById(selectorValue));
         	} else if (selectorType.equals("XPATH")) {
-        		Elements elements = doc.selectXpath(selectorValue);
-        		if (elements.size() > 0) {
-        			element = elements.get(0);
+        		if (selectorValue.contains("%d%")) {
+        			System.out.println("Multiple select XPATH");
+        			for (int i = 1; i < 100; i++) {
+        				List<org.jsoup.nodes.Element> selected = doc.selectXpath(selectorValue.replace("%d%", Integer.toString(i)));        				
+        				if (selected.size() == 1) {
+        					elements.add(selected.get(0));
+        				}
+        			}
+        		} else {
+        			List<org.jsoup.nodes.Element> selected = doc.selectXpath(selectorValue);
+        			if (selected.size() == 1) {
+        				elements.add(selected.get(0));
+        			}
         		}
         	}
         	
-        	if (element != null) {
+        	for (org.jsoup.nodes.Element element : elements) {
+        		if (element == null) break;
         		if (dataType.equals("text")) {
         			value = element.text();
         		} else if (dataType.equals("image")) {
         			value = element.attr("src");
         		}
+        		ScrapeResult scrapeResult = new ScrapeResult(url);
+        		scrapeResult.addFeature(name, value);
+        		localScrapeResults.add(scrapeResult);
         	}
-        	
-        	scrapeResult.addFeature(name, value);
         }
 
         
         if (isMultiThreaded) {
 	        synchronized (scrapeResults) {
-	        	scrapeResults.add(scrapeResult);
+	        	scrapeResults.addAll(localScrapeResults);
 	        }
         } else {
-        	scrapeResults.add(scrapeResult);
+        	scrapeResults.addAll(localScrapeResults);
         }
 	}
 	
